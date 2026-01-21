@@ -1,6 +1,6 @@
 const { todos } = require("../db");
 
-//Tüm Todoları Getirir ve Filtreler
+//-Tüm Todoları Getirir ve Filtreler
 exports.getTodos = (req, res) => {
     const status = req.query.status;
 
@@ -12,7 +12,48 @@ exports.getTodos = (req, res) => {
     return res.status(200).json(filterTodos);
 };
 
-//Tek Todo Getiren endpoit
+//-Tamamlanan Todolar
+exports.getCompleted = (req, res) => {
+    const completedTodos = todos.filter(t => t.status === "tamamlanmis");
+    return res.status(200).json(completedTodos);
+};
+
+//-Tamamlanmayan Todolar
+exports.getPending = (req, res) => {
+    const pendingTodos = todos.filter(t => t.status === "tamamlanmamis");
+    return res.status(200).json(pendingTodos);
+};
+
+//-Todo’nun durumunu Değiştiren Endpoint
+exports.putToggle = (req, res) => {
+    const id = req.params.id;
+    const todo = todos.find(t => t.id === id);
+    if (!todo) return res.status(404).json({ message: "Todo Bulunamadi" });
+
+    if (todo.status === "tamamlanmis") {
+        todo.status = "tamamlanmamis";
+    } else {
+        todo.status = "tamamlanmis";
+    }
+    return res.status(200).json(todo)
+}
+
+//-Todo’ları başlığına göre arayabilmek
+exports.getSearch = (req, res) => {
+    const q = req.query.q;
+    if (!q) return res.status(400).json({ message: "Arama Kelimesi Zorunlu" });
+    const todo = todos.filter(t => t.title === q);
+    return res.status(200).json(todo);
+}
+
+// -Todo Sayısı
+exports.getCount = (req, res) => {
+    const count = todos.length;
+    res.status(200).json({ count: count });
+
+};
+
+//-Tek Todo Getiren Endpoit
 exports.getTodoById = (req, res) => {
     const id = req.params.id;
 
@@ -21,7 +62,7 @@ exports.getTodoById = (req, res) => {
     res.status(200).json(todo);
 };
 
-//Yeni Todo Ekle
+//-Yeni Todo Ekle
 exports.getCreateTodo = (req, res) => {
     const { title } = req.body;
 
@@ -40,7 +81,7 @@ exports.getCreateTodo = (req, res) => {
     res.status(201).json(newTodo);
 };
 
-//Update Todo
+//-Update Todo
 exports.putTodo = (req, res) => {
     const { id } = req.params;
     const { title, status } = req.body;
@@ -59,7 +100,7 @@ exports.putTodo = (req, res) => {
     res.status(200).json(todo);
 };
 
-//Delete Todo
+//-Delete Todo
 exports.deleteTodo = (req, res) => {
     const { id } = req.params;
 
@@ -70,4 +111,5 @@ exports.deleteTodo = (req, res) => {
 
     todos.splice(index, 1);
     res.status(204).send();
-}
+};
+
