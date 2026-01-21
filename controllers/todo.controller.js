@@ -25,7 +25,7 @@ exports.getPending = (req, res) => {
 };
 
 //-Todo’nun durumunu Değiştiren Endpoint
-exports.putToggle = (req, res) => {
+exports.putToggle = (req, res) => { 
     const id = req.params.id;
     const todo = todos.find(t => t.id === id);
     if (!todo) return res.status(404).json({ message: "Todo Bulunamadi" });
@@ -44,6 +44,11 @@ exports.getSearch = (req, res) => {
     if (!q) return res.status(400).json({ message: "Arama Kelimesi Zorunlu" });
     const todo = todos.filter(t => t.title === q);
     return res.status(200).json(todo);
+}
+
+//En Son eklenen todo’ları görmek
+exports.getLast = (req,res) => {
+
 }
 
 // -Todo Sayısı

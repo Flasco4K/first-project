@@ -6,5 +6,10 @@ let todos = [{
     status: "tamamlanmamis", // Todo durumu
     createdAt: new Date() // Todo Oluşturulma tarihi
 }];
+// function uuidGenerator() { //İd Üret
+//     const generatadId = Math.random().toString(36).slice(2) + Date.now().toString(36);
+//     return generatadId
+// };
 
-module.exports = {todos}
+
+module.exports = { todos }

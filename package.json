@@ -4,7 +4,12 @@
     "ejs": "^4.0.1",
     "express": "^5.2.1",
     "method-override": "^3.0.0",
+    "nodemon": "^3.1.11",
     "sequelize": "^6.37.7",
-    "sqlite3": "^5.1.7"
+    "sqlite3": "^5.1.7",
+    "uuid": "^13.0.0"
+  },
+  "scripts": {
+    "start": "nodemon app.js"
   }
 }
