@@ -46,7 +46,7 @@ exports.getSearch = (req, res) => {
     return res.status(200).json(todo);
 }
 
-//En Son eklenen 3 todoyu görmek Slice() ile
+//-En Son eklenen 3 todoyu görmek Slice() ile
 exports.getLast = (req, res) => {
     const count = todos.length;
     if (count <= 3) {
@@ -56,7 +56,6 @@ exports.getLast = (req, res) => {
         res.status(200).json(lastTodos);
     }
 }
-
 // -Todo Sayısı
 exports.getCount = (req, res) => {
     const count = todos.length;
@@ -73,8 +72,20 @@ exports.getTodoById = (req, res) => {
     res.status(200).json(todo);
 };
 
+//-Todo’nun sadece başlığını getir
+exports.getTitle = (req, res) => {
+    const id = req.params.id;
+    const todo = todos.find(t => t.id === id);
+    if (!todo) return res.status(400).json({ message: "Todo Bulunamadi" });
+    return res.status(200).json({ title: todo.title});
+
+
+
+}
+
 //-Yeni Todo Ekle
 exports.getCreateTodo = (req, res) => {
+
     const { title } = req.body;
 
     if (!title) {     // Eğer title yoksa hata döner
