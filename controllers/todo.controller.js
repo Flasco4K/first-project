@@ -46,9 +46,15 @@ exports.getSearch = (req, res) => {
     return res.status(200).json(todo);
 }
 
-//En Son eklenen todo’ları görmek
+//En Son eklenen 3 todoyu görmek Slice() ile
 exports.getLast = (req, res) => {
-    const id = req.params.id;
+    const count = todos.length;
+    if (count <= 3) {
+        res.status(200).json(todos);
+    } else {
+        const lastTodos = todos.slice(-3)
+        res.status(200).json(lastTodos);
+    }
 }
 
 // -Todo Sayısı
