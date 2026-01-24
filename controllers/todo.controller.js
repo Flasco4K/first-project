@@ -64,11 +64,16 @@ exports.getCount = (req, res) => {
 };
 
 //-Tek Todo Getiren Endpoit
-exports.getTodoById = (req, res) => {
+exports.getTodoById = (req, res, next) => {
     const id = req.params.id;
 
     const todo = todos.find(t => t.id === id);
-    if (!todo) return res.status(404).json({ message: "Todo Getirilemedi" });
+    if (!todo) {
+        const err = new Error("Todo Getirilemedi");
+        err.status = 404;
+        return next(err);
+    }
+
     res.status(200).json(todo);
 };
 
@@ -77,7 +82,7 @@ exports.getTitle = (req, res) => {
     const id = req.params.id;
     const todo = todos.find(t => t.id === id);
     if (!todo) return res.status(400).json({ message: "Todo Bulunamadi" });
-    return res.status(200).json({ title: todo.title});
+    return res.status(200).json({ title: todo.title });
 
 
 
