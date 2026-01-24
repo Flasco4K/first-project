@@ -25,12 +25,15 @@ exports.getPending = (req, res) => {
 };
 
 //-Todo’nun durumunu Değiştiren Endpoint
-exports.putToggle = (req, res) => {
+exports.putToggle = (req, res, next) => {
     const id = req.params.id;
     const todo = todos.find(t => t.id === id);
-    if (!todo) return res.status(404).json({ message: "Todo Bulunamadi" });
-
-    if (todo.status === "tamamlanmis") {
+    if (!todo) {
+        const err = new Error("Todo Bulunamadı");
+        err.status(404);
+        return next(err);
+    }
+    else if (todo.status === "tamamlanmis") {
         todo.status = "tamamlanmamis";
     } else {
         todo.status = "tamamlanmis";
@@ -39,12 +42,17 @@ exports.putToggle = (req, res) => {
 }
 
 //-Todo’ları başlığına göre arayabilmek
-exports.getSearch = (req, res) => {
+exports.getSearch = (req, res, next) => {
     const q = req.query.q;
-    if (!q) return res.status(400).json({ message: "Arama Kelimesi Zorunlu" });
+
+    if (!q) {
+        const err = new Error("Arama kelimesi zorunlu");
+        err.status = 400;
+        return next(err);
+    }
     const todo = todos.filter(t => t.title === q);
     return res.status(200).json(todo);
-}
+};
 
 //-En Son eklenen 3 todoyu görmek Slice() ile
 exports.getLast = (req, res) => {
@@ -78,23 +86,28 @@ exports.getTodoById = (req, res, next) => {
 };
 
 //-Todo’nun sadece başlığını getir
-exports.getTitle = (req, res) => {
+exports.getTitle = (req, res, next) => {
     const id = req.params.id;
     const todo = todos.find(t => t.id === id);
-    if (!todo) return res.status(400).json({ message: "Todo Bulunamadi" });
+
+    if (!todo) {
+        const err = new Error("Baslik Bulunamadi");
+        err.status = 404;
+        return next(err);
+    }
     return res.status(200).json({ title: todo.title });
+};
 
-
-
-}
 
 //-Yeni Todo Ekle
-exports.getCreateTodo = (req, res) => {
+exports.getCreateTodo = (req, res, next) => {
 
     const { title } = req.body;
 
     if (!title) {     // Eğer title yoksa hata döner
-        return res.status(400).json({ message: "title girmek zorunlu" });
+        const err = new Error("Title Gİrmek Zorunlu");
+        err.status(404);
+        return next(err)
     }
     const newTodo = {  // Yeni todo objesi oluşturulur
         id: Date.now().toString(),   // Şu anki zamanı kullanarak benzersiz ID üretir
@@ -109,13 +122,15 @@ exports.getCreateTodo = (req, res) => {
 };
 
 //-Update Todo
-exports.putTodo = (req, res) => {
+exports.putTodo = (req, res, next) => {
     const { id } = req.params;
     const { title, status } = req.body;
 
     const todo = todos.find(t => t.id === id);
     if (!todo) {
-        return res.status(400).json({ message: "Todo Bulunamadi" });
+        const err = new Error("Todo Güncellenemedi");
+        err.status = 404;
+        return next(err)
     };
 
     // Eğer title gönderildiyse todo'nun title alanını günceller
@@ -128,14 +143,15 @@ exports.putTodo = (req, res) => {
 };
 
 //-Delete Todo
-exports.deleteTodo = (req, res) => {
+exports.deleteTodo = (req, res, next) => {
     const { id } = req.params;
 
     const index = todos.findIndex(t => t.id === id);
     if (index === -1) {
-        return res.status(404).json({ message: "Todo Bulunamadi" });
+        const err = new Error("Todo Bulunamadı");
+        err.status = 404
+        return next(err);
     }
-
     todos.splice(index, 1);
     res.status(204).send();
 };
