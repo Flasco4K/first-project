@@ -5,7 +5,7 @@ exports.getTodos = (req, res) => {
     const { status } = req.query;
 
     if (!status || status === "all") {
-        return res.status(200).json(status);
+        return res.status(200).json(todos);
     }
     const filterTodos = todos.filter(t => t.status === status);
     return res.status(200).json(filterTodos);
@@ -84,7 +84,6 @@ exports.getTitle = (req, res, next) => {
     }
     return res.status(200).json({ title: todo.title });
 };
-
 
 //-Yeni Todo Ekle
 exports.getCreateTodo = (req, res, next) => {
