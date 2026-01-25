@@ -3,6 +3,7 @@ const bodyParser = require("body-parser");
 const todoRoutes = require("./routes/todo.routes");
 const errorHandler = require("./middlewares/errorHandler");
 
+require("dotenv").config();
 const app = express();
 
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -12,6 +13,7 @@ app.use("/todos", todoRoutes);
 
 app.use(errorHandler); // 3️⃣ ❗ EN SON
 
-app.listen(3000, () => {
+const PORT = process.env.PORT;
+app.listen(PORT, () => {
   console.log("Server çalışıyor");
 });

@@ -9,8 +9,6 @@ const validation = require("../middlewares/validation");
 router.use(logger);
 
 router.get("/count", todoController.getCount);
-router.get("/completed", todoController.getCompleted);
-router.get("/pending", todoController.getPending);
 router.get("/search", todoController.getSearch);
 router.get("/last", todoController.getLast);
 

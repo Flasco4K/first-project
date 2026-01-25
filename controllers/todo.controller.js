@@ -2,26 +2,13 @@ const { todos } = require("../db");
 
 //-Tüm Todoları Getirir ve Filtreler
 exports.getTodos = (req, res) => {
-    const status = req.query.status;
+    const { status } = req.query;
 
-    if (!status) {
-        return res.status(200).json(todos);
+    if (!status || status === "all") {
+        return res.status(200).json(status);
     }
-
     const filterTodos = todos.filter(t => t.status === status);
     return res.status(200).json(filterTodos);
-};
-
-//-Tamamlanan Todolar
-exports.getCompleted = (req, res) => {
-    const completedTodos = todos.filter(t => t.status === "tamamlanmis");
-    return res.status(200).json(completedTodos);
-};
-
-//-Tamamlanmayan Todolar
-exports.getPending = (req, res) => {
-    const pendingTodos = todos.filter(t => t.status === "tamamlanmamis");
-    return res.status(200).json(pendingTodos);
 };
 
 //-Todo’nun durumunu Değiştiren Endpoint
