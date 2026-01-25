@@ -17,50 +17,63 @@ exports.getTodos = async (req, res, next) => {
 };
 
 //-Todo’nun durumunu Değiştiren Endpoint
-exports.putToggle = (req, res, next) => {
-    const id = req.params.id;
-    const todo = todos.find(t => t.id === id);
-    if (!todo) {
-        const err = new Error("Todo Bulunamadı");
-        err.status(404);
-        return next(err);
+exports.putToggle = async (req, res, next) => {
+    try {
+        const id = req.params.id;
+        const todo = await Todo.findById(id);
+        if (!todo) {
+            const err = new Error("Todo Bulunamadı");
+            err.status(404);
+            return next(err);
+        }
+        else if (todo.status === "tamamlanmis") {
+            todo.status = "tamamlanmamis";
+        } else {
+            todo.status = "tamamlanmis";
+        }
+        await todo.save();
+        res.status(200).json(todo);
+    } catch (err) {
+        next(err);
     }
-    else if (todo.status === "tamamlanmis") {
-        todo.status = "tamamlanmamis";
-    } else {
-        todo.status = "tamamlanmis";
-    }
-    return res.status(200).json(todo)
 }
-
 //-Todo’ları başlığına göre arayabilmek
-exports.getSearch = (req, res, next) => {
-    const q = req.query.q;
+exports.getSearch = async (req, res, next) => {
+    try {
+        const q = req.query.q;
 
-    if (!q) {
-        const err = new Error("Arama kelimesi zorunlu");
-        err.status = 400;
-        return next(err);
+        if (!q) {
+            const err = new Error("Arama kelimesi zorunlu");
+            err.status = 400;
+            return next(err);
+        }
+        const todos = Todo.find({ title: q });
+        res.status(200).json(todos);
+    } catch (err) {
+        next(err);
     }
-    const todo = todos.filter(t => t.title === q);
-    return res.status(200).json(todo);
 };
 
 //-En Son eklenen 3 todoyu görmek Slice() ile
-exports.getLast = (req, res) => {
-    const count = todos.length;
-    if (count <= 3) {
-        res.status(200).json(todos);
-    } else {
-        const lastTodos = todos.slice(-3)
+exports.getLast = async (req, res, next) => {
+    try {
+        const lastTodos = await Todo.find()
+            .sort({ cratedAt: -1 })
+            .limit(3);
         res.status(200).json(lastTodos);
+    } catch (err) {
+        next(err);
     }
-}
-// -Todo Sayısı
-exports.getCount = (req, res) => {
-    const count = todos.length;
-    res.status(200).json({ count: count });
+};
 
+// -Todo Sayısı
+exports.getCount = async (req, res, next) => {
+    try {
+        const countTodo = await Todo.countDocuments();
+        res.status(200).json({ count: countTodo });
+    } catch (err) {
+        next(err);
+    }
 };
 
 //-Tek Todo Getiren Endpoit
@@ -78,75 +91,85 @@ exports.getTodoById = (req, res, next) => {
 };
 
 //-Todo’nun sadece başlığını getir
-exports.getTitle = (req, res, next) => {
-    const id = req.params.id;
-    const todo = todos.find(t => t.id === id);
-
-    if (!todo) {
-        const err = new Error("Baslik Bulunamadi");
-        err.status = 404;
-        return next(err);
-    }
-    return res.status(200).json({ title: todo.title });
-};
-
-//-Yeni Todo Ekle
-exports.getCreateTodo = async (req, res, next) => {
+exports.getTitle = async (req, res, next) => {
     try {
-        const { title } = req.body;
 
-        if (!title) {
-            const err = new Error("Title Girmek Zorunlu");
-            err.status = 400; // Genelde eksik veri 400'dür
+        const id = req.params.id;
+        const titleTodo = await Todo.findById({ title: titleTodo });
+
+        if (!todo) {
+            const err = new Error("Baslik Bulunamadi");
+            err.status = 404;
             return next(err);
         }
-
-        // Yeni bir doküman oluşturuyoruz
-        const newTodo = new Todo({
-            title,
-            status: "tamamlanmamis"
-            // createdAt ve id otomatik oluşacak
-        });
-
-        const savedTodo = await newTodo.save(); // DB'ye kaydet
-        res.status(201).json(savedTodo);
-    } catch (err) {
-        next(err);
-    }
-};
-
-//-Update Todo
-exports.putTodo = (req, res, next) => {
-    const { id } = req.params;
-    const { title, status } = req.body;
-
-    const todo = todos.find(t => t.id === id);
-    if (!todo) {
-        const err = new Error("Todo Güncellenemedi");
-        err.status = 404;
-        return next(err)
+        return res.status(200).json({ title: todo.title });
     };
 
-    // Eğer title gönderildiyse todo'nun title alanını günceller
-    if (title !== undefined) todo.title = title;
+    //-Yeni Todo Ekle
+    exports.getCreateTodo = async (req, res, next) => {
+        try {
+            const { title } = req.body;
 
-    // Eğer status gönderildiyse todo'nun status alanını günceller
-    if (status !== undefined) todo.status = status;
+            if (!title) {
+                const err = new Error("Title Girmek Zorunlu");
+                err.status = 400; // Genelde eksik veri 400'dür
+                return next(err);
+            }
 
-    res.status(200).json(todo);
-};
+            // Yeni bir doküman oluşturuyoruz
+            const newTodo = new Todo({
+                title,
+                status: "tamamlanmamis"
+                // createdAt ve id otomatik oluşacak
+            });
 
-//-Delete Todo
-exports.deleteTodo = (req, res, next) => {
-    const { id } = req.params;
+            const savedTodo = await newTodo.save(); // DB'ye kaydet
+            res.status(201).json(savedTodo);
+        } catch (err) {
+            next(err);
+        }
+    };
 
-    const index = todos.findIndex(t => t.id === id);
-    if (index === -1) {
-        const err = new Error("Todo Bulunamadı");
-        err.status = 404
-        return next(err);
-    }
-    todos.splice(index, 1);
-    res.status(204).send();
-};
+    //-Update Todo
+    exports.putTodo = async (req, res, next) => {
+        try {
+            const { id } = req.params;
+            const { title, status } = req.body;
+
+            const updatedTodo = await Todo.findByIdAndUpdate(
+                id,
+                {
+                    title,
+                    status
+                },
+                { new: true }
+            );
+            if (!updatedTodo) {
+                const err = new Error("Todo Güncellenemedi");
+                err.status = 404;
+                return next(err)
+            };
+
+            res.status(200).send();
+        } catch (err) {
+            next(err);
+        }
+    };
+
+    //-Delete Todo
+    exports.deleteTodo = async (req, res, next) => {
+        try {
+            const { id } = req.params;
+
+            const deletedTodo = await Todo.findByIdAndDelete(id);
+            if (!deletedTodo) {
+                const err = new Error("Todo Bulunamadi,Silme Basarisiz");
+                err.status = 404
+                return next(err);
+            }
+            res.status(204).send();
+        } catch (err) {
+            next(err);
+        }
+    };
 
