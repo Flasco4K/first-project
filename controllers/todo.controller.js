@@ -1,14 +1,19 @@
-const { todos } = require("../db");
+const Todo = require("../models/todo");
 
 //-Tüm Todoları Getirir ve Filtreler
-exports.getTodos = (req, res) => {
-    const { status } = req.query;
+exports.getTodos = async (req, res, next) => {
+    try {
+        const { status } = req.query;
 
-    if (!status || status === "all") {
-        return res.status(200).json(todos);
+        if (!status || status === "all") {
+            return res.status(200).json(todos);
+        }
+
+        const filterTodos = todos.filter(t => t.status === status);
+        return res.status(200).json(filterTodos);
+    } catch (err) {
+        next(err); // Hata olursa errorHandler'a gönderir
     }
-    const filterTodos = todos.filter(t => t.status === status);
-    return res.status(200).json(filterTodos);
 };
 
 //-Todo’nun durumunu Değiştiren Endpoint
@@ -86,25 +91,28 @@ exports.getTitle = (req, res, next) => {
 };
 
 //-Yeni Todo Ekle
-exports.getCreateTodo = (req, res, next) => {
+exports.getCreateTodo = async (req, res, next) => {
+    try {
+        const { title } = req.body;
 
-    const { title } = req.body;
+        if (!title) {
+            const err = new Error("Title Girmek Zorunlu");
+            err.status = 400; // Genelde eksik veri 400'dür
+            return next(err);
+        }
 
-    if (!title) {     // Eğer title yoksa hata döner
-        const err = new Error("Title Gİrmek Zorunlu");
-        err.status(404);
-        return next(err)
+        // Yeni bir doküman oluşturuyoruz
+        const newTodo = new Todo({
+            title,
+            status: "tamamlanmamis"
+            // createdAt ve id otomatik oluşacak
+        });
+
+        const savedTodo = await newTodo.save(); // DB'ye kaydet
+        res.status(201).json(savedTodo);
+    } catch (err) {
+        next(err);
     }
-    const newTodo = {  // Yeni todo objesi oluşturulur
-        id: Date.now().toString(),   // Şu anki zamanı kullanarak benzersiz ID üretir
-
-        title,
-        status: "tamamlanmamis",
-        createdAt: new Date()
-    };
-
-    todos.push(newTodo); // Yeni todo'yu todos dizisine ekler
-    res.status(201).json(newTodo);
 };
 
 //-Update Todo
