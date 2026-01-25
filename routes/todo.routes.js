@@ -6,13 +6,15 @@ const todoController = require("../controllers/todo.controller");
 //Middlewares
 const logger = require("../middlewares/logger");
 const validation = require("../middlewares/validation");
+const throttle = require("../middlewares/throttle");
+
 router.use(logger);
 
 router.get("/count", todoController.getCount);
 router.get("/search", todoController.getSearch);
 router.get("/last", todoController.getLast);
 
-router.get("/", todoController.getTodos);
+router.get("/", throttle, todoController.getTodos);
 router.get("/:id", todoController.getTodoById);
 
 router.post("/", validation, todoController.getCreateTodo);
