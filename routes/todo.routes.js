@@ -3,19 +3,24 @@ const router = express.Router();
 
 const todoController = require("../controllers/todo.controller");
 
+//Middlewares
+const logger = require("../middlewares/logger");
+const validation = require("../middlewares/validation");
+router.use(logger);
+
 router.get("/count", todoController.getCount);
 router.get("/completed", todoController.getCompleted);
 router.get("/pending", todoController.getPending);
-router.get("/search",todoController.getSearch);
-router.get("/last",todoController.getLast);
+router.get("/search", todoController.getSearch);
+router.get("/last", todoController.getLast);
 
 router.get("/", todoController.getTodos);
 router.get("/:id", todoController.getTodoById);
 
-router.post("/", todoController.getCreateTodo);
-router.get("/:id/title",todoController.getTitle);
+router.post("/", validation, todoController.getCreateTodo);
+router.get("/:id/title", todoController.getTitle);
 router.put("/:id/toggle", todoController.putToggle);
-router.put("/:id", todoController.putTodo);
+router.put("/:id", validation, todoController.putTodo);
 router.delete("/:id", todoController.deleteTodo);
 
 module.exports = router;
