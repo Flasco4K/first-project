@@ -2,6 +2,11 @@ const mongoose = require("mongoose");
 
 // Veritabanına ne kaydedeceğimizi burada tarif ediyoruz
 const todoSchema = new mongoose.Schema({
+  userId: {
+    type: mongoose.Schema.Types.ObjectId, // MongoDB'deki özel ID türü
+    ref: "User", // Hangi modele bağlı olduğunu belirttik
+    required: true
+  },
   title: {
     type: String,
     required: true, // Başlık olmadan kayıt yapılamaz
@@ -16,6 +21,7 @@ const todoSchema = new mongoose.Schema({
     default: Date.now // Kayıt anındaki tarihi otomatik atar
   }
 });
+
 
 // Bu şemayı "Todo" adıyla bir modele dönüştürüp dışa aktarıyoruz
 module.exports = mongoose.model("Todo", todoSchema);

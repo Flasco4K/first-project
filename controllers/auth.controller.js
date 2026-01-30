@@ -1,4 +1,5 @@
 const User = require("../models/user");
+const jwt = require("jsonwebtoken");
 
 exports.register = async (req, res, next) => {
     try {
@@ -32,9 +33,15 @@ exports.login = async (req, res, next) => {
             err.status = 401;
             return next(err);
         }
+        //Token oluştur (jwt.sign kullanıyoruz)
+        const token = jwt.sign(
+            { id: user._id }, // Kimlik kartının içine kullanıcının ID'sini koyduk
+            process.env.JWT_SECRET, // .env'den anahtarı aldık
+            { expiresIn: "1h" } // Kartın son kullanma tarihini 1 saat yaptık
+        );
         res.status(200).json({
             message: "Giris Basarili",
-            userName: user.username
+            token: token //Kullanıcıya kartını teslim ettik
         })
 
     } catch (err) {
