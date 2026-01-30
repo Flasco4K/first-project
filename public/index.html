@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giriş Yap | Todo App</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-box">
+            <h2>Hoş Geldiniz</h2>
+            <p>Lütfen hesabınıza giriş yapın</p>
+            
+            <div class="input-field">
+                <input type="email" id="email" placeholder="E-posta Adresiniz" required>
+            </div>
+            
+            <div class="input-field">
+                <input type="password" id="password" placeholder="Şifreniz" required>
+            </div>
+            
+            <button onclick="login()" class="login-btn">Giriş Yap</button>
+            
+            <p id="message" class="error-msg"></p>
+            
+            <div class="login-footer">
+                <span>Henüz hesabınız yok mu? <a href="#">Kayıt Ol</a></span>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

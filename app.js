@@ -9,15 +9,13 @@ require("dotenv").config();
 conn();
 const app = express();
 
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.static('public')); // Dosyalar dışarı açıldı
 app.use(express.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use("/api",userRouter);
+app.use("/api", userRouter);
 app.use("/todos", todoRoutes);
+app.use(errorHandler);
 
-app.use(errorHandler); // 3️⃣ ❗ EN SON
-
-const PORT = process.env.PORT;
-app.listen(PORT, () => {
-  console.log("Server çalışıyor");
-});
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server ${PORT} portunda hazir!`));

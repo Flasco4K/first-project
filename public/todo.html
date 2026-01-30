@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Mermi Gibi Todolar</title>
+    <link rel="stylesheet" href="style.css"> </head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Yapılacaklar Listem</h1>
+            <button onclick="logout()" class="logout-btn">Çıkış Yap</button>
+        </header>
+
+        <div class="input-group">
+            <input type="text" id="todoTitle" placeholder="Yeni bir görev yaz...">
+            <button onclick="addTodo()" class="add-btn">Ekle</button>
+        </div>
+
+        <ul id="todoList">
+            </ul>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

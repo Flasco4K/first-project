@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
+require("dotenv").config();
 
 module.exports = (req, res, next) => {
-    // 1. Header'dan bilet (token) kontrolü
     const authHeader = req.header("Authorization");
 
     if (!authHeader) {
@@ -9,8 +9,9 @@ module.exports = (req, res, next) => {
         err.status = 401;
         return next(err);
     }
-    // 2. "Bearer <token>" kısmını ayıklama
-    const token = authHeader.split(" ")[1];
+
+    // BURAYA DİKKAT: 'token' değişkenini burada oluşturuyoruz
+    const token = authHeader.split(" ")[1]; 
 
     if (!token) {
         const err = new Error("Yetkisiz Erisim: Gecersiz Token Bilgisi");
@@ -19,15 +20,15 @@ module.exports = (req, res, next) => {
     }
 
     try {
-        // 3. Token doğrula ve içindeki bilgiyi req.user'a at
+        // 'token' yukarıda tanımlandığı için artık burada hata vermez
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = decoded; // Artık kullanıcının ID'sine her yerden erişebiliriz
-
+        req.user = decoded; 
         next();
     } catch (err) {
+        // Hata buraya düşerse 'token' hala yukarıdaki kapsamda (scope) olmalı
+        console.log("TERMİNAL HATASI:", err.message); 
         const error = new Error("Yetkisiz Erisim: Gecersiz veya Süresi Dolmus Token");
         error.status = 401;
         return next(error);
     }
-
 };
