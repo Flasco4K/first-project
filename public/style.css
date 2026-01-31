@@ -158,3 +158,48 @@ header {
     align-items: center;
     margin-bottom: 20px;
 }
+
+/* Kayıt Sayfası Özel Düzenlemeleri */
+.login-box h2 {
+    color: #28a745;
+    /* Kayıt sayfasında başlığı yeşil yaparak fark hissettirelim */
+}
+
+/* Şifrelerin eşleşmediği durumlar için opsiyonel hata sınıfı */
+.input-error {
+    border-color: #ff4757 !important;
+    background-color: #fff1f2 !important;
+}
+
+/* Giriş sayfasına dönüş linki stili */
+.login-footer a {
+    color: #28a745;
+    text-decoration: none;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.login-footer a:hover {
+    text-decoration: underline;
+    color: #218838;
+}
+
+/* Kayıt butonu bu sayfada tek başına olduğu için genişliğini tam yapalım */
+.register-btn-full {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(to right, #28a745, #218838);
+    color: white;
+    font-weight: bold;
+    font-size: 1.1rem;
+    border: none;
+    border-radius: 10px;
+    margin-top: 10px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.register-btn-full:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(40, 167, 69, 0.3);
+}

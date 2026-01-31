@@ -22,11 +22,9 @@
                 <input type="password" id="password" placeholder="Şifreniz" required>
             </div>
 
-            <div class="button-group" style="display: flex; gap: 10px; margin-top: 10px;">
-                <button onclick="login()" class="login-btn" style="flex: 1;">Giriş Yap</button>
-                <button onclick="register()" class="register-btn"
-                    style="flex: 1; background: #28a745; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s;">Kayıt
-                    Ol</button>
+            <div class="button-group">
+                <button onclick="login()" class="login-btn">Giriş Yap</button>
+                <button onclick="window.location.href='register.html'" class="register-btn">Kayıt Ol</button>
             </div>
 
             <p id="message" class="error-msg" style="margin-top: 15px; font-size: 0.85rem; min-height: 20px;"></p>

@@ -16,6 +16,7 @@ async function login() {
         }
     } catch (err) { console.error("Login Hatasi:", err); }
 }
+
 async function register() {
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
@@ -40,6 +41,34 @@ async function register() {
         }
     } catch (err) {
         console.error("Kayıt sırasında bağlantı hatası:", err);
+    }
+}
+async function handleRegister() {
+    const email = document.getElementById('regEmail').value;
+    const password = document.getElementById('regPassword').value;
+    const passwordConfirm = document.getElementById('regPasswordConfirm').value;
+
+    // Şifre Eşleşme Kontrolü
+    if (password !== passwordConfirm) {
+        return alert("Hata: Şifreler birbiriyle eşleşmiyor kanka!");
+    }
+
+    try {
+        const response = await fetch('http://localhost:3000/api/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        });
+
+        if (response.ok) {
+            alert("Kayıt mermi gibi başarılı! Şimdi giriş sayfasına uçuyorsun.");
+            window.location.href = 'index.html';
+        } else {
+            const data = await response.json();
+            alert("Kayıt Hatası: " + data.message);
+        }
+    } catch (err) {
+        console.error("Bağlantı hatası:", err);
     }
 }
 
