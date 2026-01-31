@@ -1,14 +1,16 @@
 const User = require("../models/user");
 const jwt = require("jsonwebtoken");
+const bcrypt = require('bcrypt');
 
 exports.register = async (req, res, next) => {
     try {
-        const { username, email, password } = req.body;
+        const { email, password } = req.body;
+
+        const hashedPassword = await bcrypt.hash(password, 10);
 
         const newUser = new User({
-            username,
             email,
-            password
+            password: hashedPassword
         });
         await newUser.save();
 
@@ -23,26 +25,33 @@ exports.login = async (req, res, next) => {
         const { email, password } = req.body;
         const user = await User.findOne({ email: email });
 
-        if (!user) { //User Boşsa
+        // 1. Kullanıcı Var mı Kontrolü
+        if (!user) {
             const err = new Error("Böyle Bir Kullanici Bulunamadi");
             err.status = 404;
             return next(err);
+        }
 
-        } else if (user.password != password) { //Şifreler DB`deki ile Eşleşmiyorsa
+        // 2. Şifre Karşılaştırma
+        const isMatch = await bcrypt.compare(password, user.password);
+
+        if (!isMatch) {
             const err = new Error("Hatali Sifre");
             err.status = 401;
             return next(err);
         }
-        //Token oluştur (jwt.sign kullanıyoruz)
+
+        // 3. Token Oluşturma
         const token = jwt.sign(
-            { id: user._id }, // Kimlik kartının içine kullanıcının ID'sini koyduk
-            process.env.JWT_SECRET, // .env'den anahtarı aldık
-            { expiresIn: "1h" } // Kartın son kullanma tarihini 1 saat yaptık
+            { id: user._id },
+            process.env.JWT_SECRET,
+            { expiresIn: "1h" }
         );
+
         res.status(200).json({
             message: "Giris Basarili",
-            token: token //Kullanıcıya kartını teslim ettik
-        })
+            token: token
+        });
 
     } catch (err) {
         next(err);
