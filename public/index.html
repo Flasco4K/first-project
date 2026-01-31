@@ -1,34 +1,42 @@
 <!DOCTYPE html>
 <html lang="tr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Giriş Yap | Todo App</title>
+    <title>Hoş Geldiniz | Todo App</title>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
     <div class="login-container">
         <div class="login-box">
             <h2>Hoş Geldiniz</h2>
-            <p>Lütfen hesabınıza giriş yapın</p>
-            
+            <p>Hesabınıza giriş yapın veya yeni hesap oluşturun</p>
+
             <div class="input-field">
                 <input type="email" id="email" placeholder="E-posta Adresiniz" required>
             </div>
-            
+
             <div class="input-field">
                 <input type="password" id="password" placeholder="Şifreniz" required>
             </div>
-            
-            <button onclick="login()" class="login-btn">Giriş Yap</button>
-            
-            <p id="message" class="error-msg"></p>
-            
-            <div class="login-footer">
-                <span>Henüz hesabınız yok mu? <a href="#">Kayıt Ol</a></span>
+
+            <div class="button-group" style="display: flex; gap: 10px; margin-top: 10px;">
+                <button onclick="login()" class="login-btn" style="flex: 1;">Giriş Yap</button>
+                <button onclick="register()" class="register-btn"
+                    style="flex: 1; background: #28a745; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s;">Kayıt
+                    Ol</button>
+            </div>
+
+            <p id="message" class="error-msg" style="margin-top: 15px; font-size: 0.85rem; min-height: 20px;"></p>
+
+            <div class="login-footer" style="margin-top: 20px; font-size: 0.85rem; color: #666;">
+                <span>Güvenliğiniz için şifreleriniz <strong>bcrypt</strong> ile korunmaktadır.</span>
             </div>
         </div>
     </div>
     <script src="script.js"></script>
 </body>
+
 </html>

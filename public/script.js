@@ -16,6 +16,32 @@ async function login() {
         }
     } catch (err) { console.error("Login Hatasi:", err); }
 }
+async function register() {
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+
+    if (!email || !password) {
+        return alert("Lütfen tüm alanları doldur kanka!");
+    }
+
+    try {
+        const response = await fetch('http://localhost:3000/api/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            alert("Kayıt başarılı! Şimdi giriş yapabilirsin.");
+        } else {
+            alert("Hata: " + data.message);
+        }
+    } catch (err) {
+        console.error("Kayıt sırasında bağlantı hatası:", err);
+    }
+}
 
 async function getTodos() {
     const token = localStorage.getItem('token');
@@ -27,7 +53,7 @@ async function getTodos() {
 
         if (Array.isArray(data)) {
             const list = document.getElementById('todoList');
-            list.innerHTML = ''; // Eski listeyi temizle
+            list.innerHTML = '';
 
             data.forEach(todo => {
                 list.innerHTML += `
@@ -87,6 +113,6 @@ async function deleteTodo(id) {
 }
 
 function logout() {
-    localStorage.removeItem('token'); 
-    window.location.href = 'index.html'; 
+    localStorage.removeItem('token');
+    window.location.href = 'index.html';
 }

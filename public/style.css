@@ -1,3 +1,10 @@
+/* Genel Ayarlar */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -5,57 +12,119 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: 0;
+    color: #333;
 }
 
+/* Kapsayıcı Kutular (Login ve Todo için ortak) */
+.login-box,
 .container {
     background: white;
-    padding: 2rem;
+    padding: 2.5rem;
     border-radius: 15px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-    width: 400px;
-    max-height: 80vh;
-    overflow-y: auto;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
 }
 
-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+/* Başlıklar */
+h1,
+h2 {
+    margin-bottom: 10px;
+    color: #333;
+}
+
+p {
+    color: #777;
     margin-bottom: 20px;
+    font-size: 0.9rem;
 }
 
-h1 { color: #333; font-size: 1.5rem; margin: 0; }
-
+/* Input Alanları */
+.input-field,
 .input-group {
+    margin-bottom: 15px;
     display: flex;
     gap: 10px;
-    margin-bottom: 20px;
 }
 
 input {
-    flex: 1;
-    padding: 10px;
-    border: 2px solid #ddd;
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
     border-radius: 8px;
+    background-color: #f9f9f9;
+    transition: all 0.3s;
     outline: none;
 }
 
-input:focus { border-color: #667eea; }
+input:focus {
+    border-color: #764ba2;
+    background-color: #fff;
+    box-shadow: 0 0 8px rgba(118, 75, 162, 0.2);
+}
+
+/* Buton Grubu ve Eşitleme */
+.button-group {
+    display: flex;
+    gap: 12px;
+    margin-top: 15px;
+    width: 100%;
+}
 
 button {
     cursor: pointer;
     border: none;
     border-radius: 8px;
-    transition: 0.3s;
+    font-weight: bold;
+    transition: transform 0.2s, opacity 0.2s, box-shadow 0.2s;
 }
 
-.add-btn { background: #28a745; color: white; padding: 0 15px; }
-.add-btn:hover { background: #218838; }
+/* Özel Buton Renkleri */
+.login-btn {
+    flex: 1;
+    padding: 12px;
+    background: linear-gradient(to right, #667eea, #764ba2);
+    color: white;
+}
 
-.logout-btn { background: #ff4757; color: white; padding: 5px 10px; font-size: 0.8rem; }
+.register-btn {
+    flex: 1;
+    padding: 12px;
+    background: linear-gradient(to right, #28a745, #218838);
+    color: white;
+}
 
-ul { list-style: none; padding: 0; }
+.add-btn {
+    background: #764ba2;
+    color: white;
+    padding: 0 20px;
+}
+
+.logout-btn {
+    background: #ff4757;
+    color: white;
+    padding: 5px 12px;
+    font-size: 0.8rem;
+}
+
+button:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+/* Todo Listesi Özel */
+ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 20px;
+    max-height: 300px;
+    overflow-y: auto;
+}
 
 li {
     background: #f8f9fa;
@@ -65,103 +134,27 @@ li {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-left: 5px solid #667eea;
+    border-left: 5px solid #764ba2;
+    text-align: left;
 }
 
 .delete-btn {
     background: #ff4757;
     color: white;
-    padding: 5px 10px;
-    font-size: 0.7rem;
+    padding: 6px 10px;
+    font-size: 0.75rem;
 }
 
-/* Giriş Sayfasına Özel Stilller */
-.login-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-}
-
-.login-box {
-    background: white;
-    padding: 2.5rem;
-    border-radius: 15px;
-    box-shadow: 0 15px 35px rgba(0,0,0,0.3);
-    width: 100%;
-    max-width: 380px;
-    text-align: center;
-}
-
-.login-box h2 {
-    margin-bottom: 10px;
-    color: #333;
-    font-weight: 700;
-}
-
-.login-box p {
-    color: #777;
-    margin-bottom: 25px;
-    font-size: 0.9rem;
-}
-
-.input-field {
-    margin-bottom: 15px;
-}
-
-.input-field input {
-    width: 100%;
-    padding: 12px;
-    box-sizing: border-box; /* Padding'in genişliği bozmasını engeller */
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    background-color: #f9f9f9;
-    transition: all 0.3s;
-}
-
-.input-field input:focus {
-    border-color: #764ba2;
-    background-color: #fff;
-    box-shadow: 0 0 8px rgba(118, 75, 162, 0.2);
-}
-
-.login-btn {
-    width: 100%;
-    padding: 12px;
-    background: linear-gradient(to right, #667eea, #764ba2);
-    color: white;
-    font-weight: bold;
-    font-size: 1rem;
-    border: none;
-    border-radius: 8px;
-    margin-top: 10px;
-    transition: transform 0.2s, opacity 0.2s;
-}
-
-.login-btn:hover {
-    opacity: 0.9;
-    transform: translateY(-2px);
-}
-
+/* Mesajlar */
 .error-msg {
     color: #ff4757;
-    margin-top: 15px;
+    margin-top: 10px;
     font-size: 0.85rem;
-    min-height: 20px;
 }
 
-.login-footer {
-    margin-top: 20px;
-    font-size: 0.85rem;
-    color: #666;
-}
-
-.login-footer a {
-    color: #764ba2;
-    text-decoration: none;
-    font-weight: bold;
-}
-
-.login-footer a:hover {
-    text-decoration: underline;
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
 }
