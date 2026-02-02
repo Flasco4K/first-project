@@ -1,3 +1,4 @@
+
 const userRepository = require("../repositories/user.repository");
 const bcrypt = require('bcrypt');
 const jwt = require("jsonwebtoken");
@@ -20,10 +21,10 @@ class AuthService {
     async login(email, password) {
         const user = await userRepository.findByEmail(email);
 
-        // Önce kullanıcı var mı diye bakıyoruz
-        if (!user) {
-            throw new Error("Böyle bir kullanıcı bulunamadı");
+        if (!user) { // Güvenlik için kullanıcı yoksa veya şifre yanlışsa AYNI mesajı dönüyoruz
+            throw new Error("Geçersiz email veya şifre!");
         }
+
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
             throw new Error("Şifreler Eşleşmiyor"); ""

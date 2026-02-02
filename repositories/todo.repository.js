@@ -20,7 +20,8 @@ class TodoRepository {
     };
 
     async create(todoData) { //Ekle
-        return Todo.create(todoData);
+        const newTodo = new Todo(todoData);
+        return await newTodo.save();
     };
 
     async count(userId) { //Sayi
@@ -36,4 +37,14 @@ class TodoRepository {
             },
         })
     };
+
+    async getLast(userId) {
+        return Todo.find({ userId }).sort({ createdAt: -1 }).limit(3);
+    };
+
+    async getTitle(id, userId) {
+        return Todo.findOne({ _id: id, userId }).select("title");
+    };
 }
+
+module.exports = new TodoRepository();

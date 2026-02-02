@@ -1,4 +1,3 @@
-const Todo = require("../models/todo");
 const todoService = require("../services/todo.service");
 
 //-Tüm Todoları Getirir ve Filtreler
@@ -32,14 +31,10 @@ exports.putToggle = async (req, res, next) => {
 //-Todo’ları başlığına göre arayabilmek
 exports.getSearch = async (req, res, next) => {
     try {
-        const q = req.query.q;
+        const searchTerm = req.query.title;
+        const userId = req.user.id;
 
-        if (!q) {
-            const err = new Error("Arama kelimesi zorunlu");
-            err.status = 400;
-            return next(err);
-        }
-        const todos = await Todo.find({ title: q, userId: req.user.id });
+        const todos = await todoService.getSearch(userId, searchTerm)
         res.status(200).json(todos);
     } catch (err) {
         next(err);
@@ -49,9 +44,7 @@ exports.getSearch = async (req, res, next) => {
 //-En Son eklenen 3 todoyu görmek Slice() ile
 exports.getLast = async (req, res, next) => {
     try {
-        const lastTodos = await Todo.find({ userId: req.user.id })
-            .sort({ createdAt: -1 })
-            .limit(3);
+        const lastTodos = await todoService.getLast(req.user.id);
         res.status(200).json(lastTodos);
     } catch (err) {
         next(err);
@@ -61,7 +54,8 @@ exports.getLast = async (req, res, next) => {
 // -Todo Sayısı
 exports.getCount = async (req, res, next) => {
     try {
-        res.status(200).json({ count: countTodo, });
+        const count = await todoService.getCount(req.user.id);
+        res.status(200).json({ count });
     } catch (err) {
         next(err);
     }
@@ -70,13 +64,10 @@ exports.getCount = async (req, res, next) => {
 //-Tek Todo Getiren Endpoit
 exports.getTodoById = async (req, res, next) => {
     try {
-        const id = req.params.id;
-        const todo = await Todo.findOne({ _id: id, userId: req.user.id });
-        if (!todo) {
-            const err = new Error("Todo Getirilemedi");
-            err.status = 404;
-            return next(err);
-        }
+        const { id } = req.params;
+        const userId = req.user.id;
+
+        const todo = await todoService.getTodoById(id, userId);
         return res.status(200).json(todo);
     } catch (err) {
         next(err);
@@ -86,17 +77,9 @@ exports.getTodoById = async (req, res, next) => {
 //-Todo’nun sadece başlığını getir
 exports.getTitle = async (req, res, next) => {
     try {
-        // 1.findById içine direkt 'id' yazılır.
-        // 2. select("title") diyerek sadece başlığı getirmesini söyleriz.
-        const id = req.params.id;
-        const todo = await Todo.findOne({ _id: id, userId: req.user.id }).select("title");
-
-        if (!todo) {
-            const err = new Error("Baslik Bulunamadi");
-            err.status = 404;
-            return next(err);
-        }
-        return res.status(200).json(todo);
+        const { id } = req.params;
+        const todoTitle = await todoService.getTitle(id, req.user.id);
+        res.status(200).json(todoTitle);
     } catch (err) {
         next(err);
     }
@@ -105,24 +88,12 @@ exports.getTitle = async (req, res, next) => {
 //-Yeni Todo Ekle
 exports.getCreateTodo = async (req, res, next) => {
     try {
-        const { title } = req.body;
+        const { title, description } = req.body;
+        const userId = req.user.id;
 
-        if (!title) {
-            const err = new Error("Title Girmek Zorunlu");
-            err.status = 400;
-            return next(err);
-        }
+        const newTodo = await todoService.createdTodo({ title, description, userId });
 
-        // Yeni bir doküman oluşturuyoruz
-        const newTodo = new Todo({
-            title,
-            status: "tamamlanmamis",
-            userId: req.user.id
-
-        });
-
-        const savedTodo = await newTodo.save(); // DB'ye kaydet
-        res.status(201).json(savedTodo);
+        res.status(201).json({ message: "Todo Eklendi", todo: newTodo });
     } catch (err) {
         next(err);
     }
@@ -131,21 +102,13 @@ exports.getCreateTodo = async (req, res, next) => {
 //-Update Todo
 exports.putTodo = async (req, res, next) => {
     try {
-        const { id } = req.params;
-        const { title, status } = req.body;
+        const { id } = req.params;    // URL'den Todo ID
+        const userId = req.user.id;   // Token'dan User ID (Güvenlik!)
+        const todoData = req.body;   // Body'den Yeni Veriler (title, description)
 
-        const updatedTodo = await Todo.findOneAndUpdate(
-            { _id: id, userId: req.user.id },
-            { title, status },
-            { new: true }
-        );
-        if (!updatedTodo) {
-            const err = new Error("Todo Güncellenemedi");
-            err.status = 404;
-            return next(err)
-        };
+        const updatedTodo = await todoService.putTodo(id, userId, todoData);
 
-        res.status(200).send();
+        res.status(200).json({ message: "Güncelleme başarılı kanka", todo: updatedTodo });
     } catch (err) {
         next(err);
     }
@@ -155,16 +118,11 @@ exports.putTodo = async (req, res, next) => {
 exports.deleteTodo = async (req, res, next) => {
     try {
         const { id } = req.params;
+        const userId = req.user.id;
 
-        // Sadece ID ile değil, sahibiyle beraber arayıp sil
-        const deletedTodo = await Todo.findOneAndDelete({ _id: id, userId: req.user.id });
+        await todoService.deleteTodo(id, userId)
 
-        if (!deletedTodo) {
-            const err = new Error("Todo Bulunamadi,Silme Basarisiz");
-            err.status = 404
-            return next(err);
-        }
-        res.status(204).send();
+        res.status(200).json({ message: "Todo Başarıyla Silindi" });
     } catch (err) {
         next(err);
     }

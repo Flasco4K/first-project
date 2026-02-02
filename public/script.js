@@ -1,108 +1,89 @@
+// --- AUTH İŞLEMLERİ ---
+
 async function login() {
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
+
     try {
-        const response = await fetch('http://localhost:3000/api/login', {
+        const response = await fetch('/api/auth/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password })
         });
         const data = await response.json();
         if (response.ok) {
-            localStorage.setItem('token', data.token); // Bilet kilitlendi!
+            localStorage.setItem('token', data.token);
             window.location.href = 'todo.html';
         } else {
-            alert(data.message);
+            alert(data.error || "Giriş başarısız!");
         }
-    } catch (err) { console.error("Login Hatasi:", err); }
+    } catch (err) { alert("Sunucu hatası!"); }
 }
 
-async function register() {
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-
-    if (!email || !password) {
-        return alert("Lütfen tüm alanları doldur kanka!");
-    }
-
-    try {
-        const response = await fetch('http://localhost:3000/api/register', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password })
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-            alert("Kayıt başarılı! Şimdi giriş yapabilirsin.");
-        } else {
-            alert("Hata: " + data.message);
-        }
-    } catch (err) {
-        console.error("Kayıt sırasında bağlantı hatası:", err);
-    }
-}
 async function handleRegister() {
     const email = document.getElementById('regEmail').value;
     const password = document.getElementById('regPassword').value;
-    const passwordConfirm = document.getElementById('regPasswordConfirm').value;
+    const confirm = document.getElementById('regPasswordConfirm').value;
 
-    // Şifre Eşleşme Kontrolü
-    if (password !== passwordConfirm) {
-        return alert("Hata: Şifreler birbiriyle eşleşmiyor kanka!");
-    }
+    if (password !== confirm) return alert("Şifreler uyuşmuyor!");
 
     try {
-        const response = await fetch('http://localhost:3000/api/register', {
+        const response = await fetch('/api/auth/register', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password })
         });
-
         if (response.ok) {
-            alert("Kayıt mermi gibi başarılı! Şimdi giriş sayfasına uçuyorsun.");
+            alert("Kayıt başarılı! Giriş yapabilirsin.");
             window.location.href = 'index.html';
         } else {
             const data = await response.json();
-            alert("Kayıt Hatası: " + data.message);
+            alert(data.error || "Kayıt hatası!");
         }
-    } catch (err) {
-        console.error("Bağlantı hatası:", err);
-    }
+    } catch (err) { alert("Bağlantı hatası!"); }
 }
+
+// --- ÇIKIŞ YAP (Hatanın Çözümü) ---
+function logout() {
+    localStorage.removeItem('token');
+    window.location.href = 'index.html';
+}
+
+// --- TODO İŞLEMLERİ ---
 
 async function getTodos() {
     const token = localStorage.getItem('token');
+    if (!token) return window.location.href = 'index.html';
+
     try {
-        const response = await fetch('http://localhost:3000/todos', {
+        const response = await fetch('/api/todos', {
             headers: { 'Authorization': `Bearer ${token}` }
         });
-        const data = await response.json();
+        
+        if (response.status === 401) return logout(); // Token geçersizse şutla
 
+        const data = await response.json();
         if (Array.isArray(data)) {
             const list = document.getElementById('todoList');
-            list.innerHTML = '';
-
-            data.forEach(todo => {
-                list.innerHTML += `
-        <li>
-            <span>${todo.title}</span>
-            <button onclick="deleteTodo('${todo._id}')" class="delete-btn">Sil</button>
-        </li>
-    `;
-            });
+            list.innerHTML = data.map(todo => `
+                <li>
+                    <span class="${todo.completed ? 'completed' : ''}">${todo.title}</span>
+                    <button onclick="deleteTodo('${todo._id}')">Sil</button>
+                </li>
+            `).join('');
         }
-    } catch (err) {
-        console.error("Todolar çekilemedi:", err);
-    }
+    } catch (err) { console.error("Todolar çekilemedi:", err); }
 }
 
 async function addTodo() {
-    const title = document.getElementById('todoTitle').value;
+    const input = document.getElementById('todoTitle');
+    const title = input.value;
     const token = localStorage.getItem('token');
+
+    if (!title.trim()) return alert("Bir şeyler yaz kanka!");
+
     try {
-        const response = await fetch('http://localhost:3000/todos', {
+        const response = await fetch('/api/todos', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -110,38 +91,34 @@ async function addTodo() {
             },
             body: JSON.stringify({ title })
         });
+
         if (response.ok) {
-            document.getElementById('todoTitle').value = '';
+            input.value = '';
             getTodos();
+        } else {
+            const data = await response.json();
+            alert("Ekleme hatası: " + (data.error || "Sunucu hatası"));
         }
-    } catch (err) { console.error("Ekleme Hatasi:", err); }
+    } catch (err) { console.error("Ekleme Hatası:", err); }
 }
 
 async function deleteTodo(id) {
     const token = localStorage.getItem('token');
-    if (!confirm("Bu görevi silmek istediğine emin misin?")) return;
+    if (!confirm("Silmek istediğine emin misin?")) return;
 
     try {
-        const response = await fetch(`http://localhost:3000/todos/${id}`, {
+        const response = await fetch(`/api/todos/${id}`, {
             method: 'DELETE',
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
+            headers: { 'Authorization': `Bearer ${token}` }
         });
-
+        
         if (response.ok) {
-            console.log("Görev başarıyla silindi");
-            getTodos(); // Listeyi hemen tazele kanka
-        } else {
-            const data = await response.json();
-            alert("Silme hatası: " + data.message);
+            getTodos();
         }
-    } catch (err) {
-        console.error("Silme işlemi sırasında bağlantı hatası:", err);
-    }
+    } catch (err) { console.error("Silme hatası:", err); }
 }
 
-function logout() {
-    localStorage.removeItem('token');
-    window.location.href = 'index.html';
+// Sayfa açıldığında todoları otomatik getir
+if (window.location.pathname.includes('todo.html')) {
+    getTodos();
 }

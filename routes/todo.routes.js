@@ -1,30 +1,21 @@
 const express = require("express");
 const router = express.Router();
 const todoController = require("../controllers/todo.controller");
+const authMiddleware = require("../middlewares/authMiddleware"); 
 
-// Middlewares
-const auth = require("../middlewares/authMiddleware");
-const logger = require("../middlewares/logger");
-const validation = require("../middlewares/validation");
-const throttle = require("../middlewares/throttle");
+router.use(authMiddleware);
 
-router.use(logger);
-
-
-router.use(auth);
-
+// Parametresiz rotalar üste (Çakışma olmasın diye)
+router.get("/last", todoController.getLast);
 router.get("/count", todoController.getCount);
 router.get("/search", todoController.getSearch);
-router.get("/last", todoController.getLast);
 
-router.get("/", throttle, todoController.getTodos);
-router.post("/", validation, todoController.getCreateTodo);
-
-router.get("/:id/title", todoController.getTitle);
+// Standart CRUD
+router.get("/", todoController.getTodos);
+router.post("/", todoController.getCreateTodo);
 router.get("/:id", todoController.getTodoById);
-
-router.put("/:id/toggle", todoController.putToggle);
-router.put("/:id", validation, todoController.putTodo);
+router.put("/:id", todoController.putTodo);
+router.patch("/toggle/:id", todoController.putToggle);
 router.delete("/:id", todoController.deleteTodo);
 
 module.exports = router;

@@ -1,21 +1,24 @@
 const express = require("express");
-const bodyParser = require("body-parser");
+const path = require("path");
+const dotenv = require("dotenv");
+const connectDB = require("./db"); // db.js dosyanı çağırdık
+const authRoutes = require("./routes/auth.routes");
 const todoRoutes = require("./routes/todo.routes");
-const errorHandler = require("./middlewares/errorHandler");
-const conn = require("./db");
-const userRouter = require("./routes/auth.routes");
 
-require("dotenv").config();
-conn();
+dotenv.config();
+
 const app = express();
+connectDB(); 
 
-app.use(express.static('public')); // Dosyalar dışarı açıldı
-app.use(express.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.json()); 
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, "public")));
 
-app.use("/api", userRouter);
-app.use("/todos", todoRoutes);
-app.use(errorHandler);
+app.use("/api/auth", authRoutes);
+app.use("/api/todos", todoRoutes);
 
+// 8. Sunucuyu Başlat
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server ${PORT} portunda hazir!`));
+app.listen(PORT, () => {
+    console.log(`Backend ${PORT} portunda mermi gibi çalışıyor! 🚀`);
+});
