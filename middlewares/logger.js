@@ -1,9 +1,14 @@
-//Gelen request’i görmek
-const logger = (req, res, next) => {
-    const method = req.method;
-    const url = req.url;
-    console.log(method, url);
-    next();
-}
+const pinoHttp = require("pino-http");
+
+const logger = pinoHttp({
+  transport: {
+    target: "pino-pretty",
+    options: {
+      colorize: true,
+      translateTime: "SYS:standard",
+      ignore: "pid,hostname",
+    },
+  },
+});
 
 module.exports = logger;

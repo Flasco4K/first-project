@@ -1,10 +1,24 @@
 const rateLimit = require("express-rate-limit");
 
 const throttle = rateLimit({
-    windowMs: 60 * 1000, // 1 dakika
-    max: 5,              // max 5 istek
-    message: "Çok fazla istek attın, biraz bekle"
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    message: "Cok fazla istek gonderdiniz, lutfen daha sonra tekrar deneyin",
+  },
+  handler: (req, res) => {
+    res.status(429).json({
+      success: false,
+      message: "Cok fazla istek gonderdiniz, lutfen daha sonra tekrar deneyin",
+      retryAfter: Math.ceil(req.rateLimit.resetTime / 1000),
+    });
+  },
+  skip: (req) => {
+    return process.env.NODE_ENV === "development";
+  },
 });
 
 module.exports = throttle;
-

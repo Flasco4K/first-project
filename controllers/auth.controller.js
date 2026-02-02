@@ -1,59 +1,65 @@
-const User = require("../models/user");
+const userRepository = require("../repositories/user.repository");
 const jwt = require("jsonwebtoken");
-const bcrypt = require('bcrypt');
+const bcrypt = require("bcrypt");
 
 exports.register = async (req, res, next) => {
-    try {
-        const { email, password } = req.body;
+  try {
+    const { email, password } = req.body;
 
-        const hashedPassword = await bcrypt.hash(password, 10);
-
-        const newUser = new User({
-            email,
-            password: hashedPassword
-        });
-        await newUser.save();
-
-        res.status(201).json({ message: "Kullanici Basariyla Olusturuldu", user: newUser });
-    } catch (err) {
-        next(err);
+    const existingUser = await userRepository.findByEmail(email);
+    if (existingUser) {
+      const err = new Error("Email zaten kullaniliyor");
+      err.status = 409;
+      return next(err);
     }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = await userRepository.create({
+      email,
+      password: hashedPassword,
+    });
+
+    res.status(201).json({
+      message: "Kullanici Basariyla Olusturuldu",
+      user: {
+        id: newUser._id,
+        email: newUser.email,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
 };
 
 exports.login = async (req, res, next) => {
-    try {
-        const { email, password } = req.body;
-        const user = await User.findOne({ email: email });
+  try {
+    const { email, password } = req.body;
 
-        // 1. Kullanıcı Var mı Kontrolü
-        if (!user) {
-            const err = new Error("Böyle Bir Kullanici Bulunamadi");
-            err.status = 404;
-            return next(err);
-        }
+    const user = await userRepository.findByEmailWithPassword(email);
 
-        // 2. Şifre Karşılaştırma
-        const isMatch = await bcrypt.compare(password, user.password);
-
-        if (!isMatch) {
-            const err = new Error("Hatali Sifre");
-            err.status = 401;
-            return next(err);
-        }
-
-        // 3. Token Oluşturma
-        const token = jwt.sign(
-            { id: user._id },
-            process.env.JWT_SECRET,
-            { expiresIn: "1h" }
-        );
-
-        res.status(200).json({
-            message: "Giris Basarili",
-            token: token
-        });
-
-    } catch (err) {
-        next(err);
+    if (!user) {
+      const err = new Error("Boyle Bir Kullanici Bulunamadi");
+      err.status = 404;
+      return next(err);
     }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      const err = new Error("Hatali Sifre");
+      err.status = 401;
+      return next(err);
+    }
+
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "1h",
+    });
+
+    res.status(200).json({
+      message: "Giris Basarili",
+      token,
+    });
+  } catch (err) {
+    next(err);
+  }
 };
