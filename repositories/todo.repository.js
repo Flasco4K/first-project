@@ -20,8 +20,7 @@ class TodoRepository {
     };
 
     async create(todoData) { //Ekle
-        const todo = new Todo(todoData);
-        return todo.save();
+        return Todo.create(todoData);
     };
 
     async count(userId) { //Sayi

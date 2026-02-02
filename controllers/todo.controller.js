@@ -1,40 +1,29 @@
 const Todo = require("../models/todo");
+const todoService = require("../services/todo.service");
 
 //-Tüm Todoları Getirir ve Filtreler
 exports.getTodos = async (req, res, next) => {
     try {
-        const todos = await Todo.find({ userId: req.user.id });
+        const userId = req.user.id;
 
-        const { status } = req.query;
+        const todos = await todoService.getTodos(userId)
 
-        if (!status || status === "all") {
-            return res.status(200).json(todos);
-        }
-
-        const filterTodos = todos.filter(t => t.status === status);
-        return res.status(200).json(filterTodos);
+        return res.status(200).json(todos);
     } catch (err) {
-        next(err); // Hata olursa errorHandler'a gönderir
+        next(err);
     }
 };
 
 //-Todo’nun durumunu Değiştiren Endpoint
 exports.putToggle = async (req, res, next) => {
     try {
-        const id = req.params.id;
-        const todo = await Todo.findOne({ _id: id, userId: req.user.id });
-        if (!todo) {
-            const err = new Error("Todo Bulunamadı");
-            err.status(404);
-            return next(err);
-        }
-        else if (todo.status === "tamamlanmis") {
-            todo.status = "tamamlanmamis";
-        } else {
-            todo.status = "tamamlanmis";
-        }
-        await todo.save();
-        res.status(200).json(todo);
+        const { id } = req.params;
+        const userId = req.user.id;
+        const updatedTodo = await todoService.putToggle(id, userId)
+        res.status(200).json({
+            message: "Durum Başarıyla Güncellendi",
+            todo: updatedTodo
+        });
     } catch (err) {
         next(err);
     }
