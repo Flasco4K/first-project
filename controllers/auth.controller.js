@@ -25,7 +25,7 @@ exports.login = async (req, res, next) => {
         const { email, password } = req.body;
         const user = await User.findOne({ email: email });
 
-        // 1. Kullanıcı Var mı Kontrolü ?
+        // 1. Kullanıcı Var mı Kontrolü 
         if (!user) {
             const err = new Error("Böyle Bir Kullanici Bulunamadi");
             err.status = 404;
