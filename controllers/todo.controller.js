@@ -72,7 +72,6 @@ exports.getLast = async (req, res, next) => {
 // -Todo Sayısı
 exports.getCount = async (req, res, next) => {
     try {
-        const countTodo = await Todo.countDocuments({ userId: req.user.id });
         res.status(200).json({ count: countTodo, });
     } catch (err) {
         next(err);
