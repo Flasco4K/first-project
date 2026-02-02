@@ -32,7 +32,7 @@ exports.login = async (req, res, next) => {
             return next(err);
         }
 
-        // 2. Şifre Karşılaştırma
+        // 2. Şifre Karşılaştırma ?
         const isMatch = await bcrypt.compare(password, user.password);
 
         if (!isMatch) {
@@ -41,7 +41,7 @@ exports.login = async (req, res, next) => {
             return next(err);
         }
 
-        // 3. Token Oluşturma
+        // 3. Token Oluşturma 
         const token = jwt.sign(
             { id: user._id },
             process.env.JWT_SECRET,
