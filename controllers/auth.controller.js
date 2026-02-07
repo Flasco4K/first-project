@@ -20,12 +20,7 @@ exports.register = async (req, res, next) => {
 exports.login = async (req, res, next) => {
     try {
         const { email, password } = req.body;
-
-        //1. Email Kontrolü
-        // 2. Şifre Karşılaştırma
-        // 3. Token Oluşturma
-
-        const { token } = await authService.login(email, password); // Bütün o email/şifre kontrolleri artık Service'in içinde bitti
+        const { token } = await authService.login(email, password); 
         res.status(200).json({ message: "Giris Basarili", token: token });
 
     } catch (err) {

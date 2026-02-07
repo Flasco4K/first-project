@@ -2,7 +2,7 @@ const User = require("../models/user");
 
 class UserRepository {
     async findByEmail(email) { 
-        return User.findOne({ email })
+        return User.findOne({ email }).select("+password");
     }
 
     async findById(id) {

@@ -27,7 +27,7 @@ class AuthService {
 
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
-            throw new Error("Şifreler Eşleşmiyor"); ""
+            throw new Error("Şifreler Eşleşmiyor");
         }
 
         const token = jwt.sign(
