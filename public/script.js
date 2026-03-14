@@ -1,5 +1,4 @@
 // --- AUTH İŞLEMLERİ ---
-
 async function login() {
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
@@ -50,7 +49,6 @@ function logout() {
 }
 
 // --- TODO İŞLEMLERİ ---
-
 async function getTodos() {
     const token = localStorage.getItem('token');
     if (!token) return window.location.href = 'index.html';
